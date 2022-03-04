@@ -1,5 +1,6 @@
 #pragma once
 #include "Mapper.h"
+#include "CPU.h"
 
 namespace sn
 {
@@ -15,33 +16,31 @@ namespace sn
     NameTableMirroring getNameTableMirroring();
     Byte readCHR(Address addr);
     void writeCHR(Address addr, Byte value);
-    bool irqState();
-    void irqClear();
     void scanline();
+    void SetBanks();
+    CPU *m_cpu;
 
-  private:
-    // Control variables
-    uint32_t nTargetRegister;
-    bool bPRGBankMode;
-    bool bCHRInversion;
+    private:
+
     NameTableMirroring mirrormode;
-
-    uint32_t pRegister[8];
-    Byte chram[0x2000];
-    Byte ppuram[0x800];
+    
+    // Set Banks & Register Banks
+    Byte reg8000;
+    Byte regs[8];
     Byte banks;
-    Byte lastread;
-    bool bIRQActive;
-    bool bIRQEnable;
-    Address nIRQCounter;
-    Address nIRQReload;
-    bool m_irqReloadPending;
 
+   // IRQ Registers
+    Byte irqPeriod;
+    Byte irqCounter;
+    bool irqEnabled;
+
+    // PRG BANKS 
     const Byte *prgbank0;
     const Byte *prgbank1;
     const Byte *prgbank2;
     const Byte *prgbank3;
-
+    
+    // CHR BANKS
     const Byte *chrbank0;
     const Byte *chrbank1;
     const Byte *chrbank2;
@@ -51,7 +50,9 @@ namespace sn
     const Byte *chrbank6;
     const Byte *chrbank7;
 
-    std::vector<Byte> ramstatic;
+    std::vector<Byte> prgram;
+    std::vector<Byte> chram;
+    
     std::function<void(void)> m_mirroringCallback;
   };
 
