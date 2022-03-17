@@ -5,6 +5,13 @@ SimpleNES
 An NES emulator written in C++ for nothing but fun.
 
 Roughly 40-50% of games should work (ie. games that use either no mapper or mappers 1, 2 ,3 ,4 (BUG),7 & 66 partial 11).
+Added APU experimental works with the sdl2 library
+in linux i have encountered a problem 
+with apu enabled only the debug mode works 
+and few games crash.
+
+the build release gives a black screen maybe there is a bug in the apu.
+
 
 
 
