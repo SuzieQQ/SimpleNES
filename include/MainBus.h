@@ -6,6 +6,7 @@
 #include <memory>
 #include "Cartridge.h"
 #include "Mapper.h"
+#include "apu.h"
 
 namespace sn
 {
@@ -20,6 +21,7 @@ namespace sn
         PPUADDR,
         PPUDATA,
         OAMDMA = 0x4014,
+        APUSTATUS = 0x4015,
         JOY1 = 0x4016,
         JOY2 = 0x4017,
     };
@@ -34,10 +36,12 @@ namespace sn
             bool setWriteCallback(IORegisters reg, std::function<void(Byte)> callback);
             bool setReadCallback(IORegisters reg, std::function<Byte(void)> callback);
             const Byte* getPagePtr(Byte page);
+            
         private:
             std::vector<Byte> m_RAM;
             std::vector<Byte> m_extRAM;
             Mapper* m_mapper;
+            APU apu;
 
             std::map<IORegisters, std::function<void(Byte)>> m_writeCallbacks;
             std::map<IORegisters, std::function<Byte(void)>> m_readCallbacks;;
