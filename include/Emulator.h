@@ -8,6 +8,7 @@
 #include "MainBus.h"
 #include "PictureBus.h"
 #include "Controller.h"
+#include "apu.h"
 
 namespace sn
 {
@@ -32,6 +33,7 @@ namespace sn
         PictureBus m_pictureBus;
         CPU m_cpu;
         PPU m_ppu;
+        APU m_apu;
         Cartridge m_cartridge;
         std::unique_ptr<Mapper> m_mapper;
 
@@ -40,6 +42,7 @@ namespace sn
         sf::RenderWindow m_window;
         VirtualScreen m_emulatorScreen;
         float m_screenScale;
+        int elapsed;
 
         TimePoint m_cycleTimer;
 
