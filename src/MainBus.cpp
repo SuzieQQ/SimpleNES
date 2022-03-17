@@ -11,7 +11,9 @@ namespace sn
     }
 
     Byte MainBus::read(Address addr)
-    {
+    { 
+        uint8_t data = 0x00;
+
         if (addr < 0x2000)
             return m_RAM[addr & 0x7ff];
         else if (addr < 0x4020)
@@ -36,6 +38,11 @@ namespace sn
                 else
                     LOG(InfoVerbose) << "No read callback registered for I/O register at: " << std::hex << +addr << std::endl;
             }
+            else if (addr == 0x4015)
+	        {
+		   // APU Read Status
+		       return  apu.read8(addr);
+      	    }
             else
                 LOG(InfoVerbose) << "Read access attempt at: " << std::hex << +addr << std::endl;
         }
@@ -58,7 +65,7 @@ namespace sn
     }
 
     void MainBus::write(Address addr, Byte value)
-    {
+    {  uint8_t data = 0x0;
         if (addr < 0x2000)
             m_RAM[addr & 0x7ff] = value;
         else if (addr < 0x4020)
@@ -73,6 +80,10 @@ namespace sn
                 else
                     LOG(InfoVerbose) << "No write callback registered for I/O register at: " << std::hex << +addr << std::endl;
             }
+            else if ((addr >= 0x4000 && addr <= 0x4013) || addr == 0x4015 || addr == 0x4017) //  NES APU
+	        {
+		       apu.write8(data,addr, value);
+	         }
             else if (addr < 0x4017 && addr >= 0x4014) //only some registers
             {
                 auto it = m_writeCallbacks.find(static_cast<IORegisters>(addr));

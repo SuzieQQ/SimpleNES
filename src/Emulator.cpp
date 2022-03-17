@@ -4,6 +4,7 @@
 #include <thread>
 #include <chrono>
 
+
 namespace sn
 {
     Emulator::Emulator() :
@@ -11,11 +12,13 @@ namespace sn
         m_ppu(m_pictureBus, m_emulatorScreen),
         m_screenScale(2.f),
         m_cycleTimer(),
-        m_cpuCycleDuration(std::chrono::nanoseconds(559))
+        m_cpuCycleDuration(std::chrono::nanoseconds(629))
+        //m_cpuCycleDuration(std::chrono::nanoseconds(599))
     {
         if(!m_bus.setReadCallback(PPUSTATUS, [&](void) {return m_ppu.getStatus();}) ||
             !m_bus.setReadCallback(PPUDATA, [&](void) {return m_ppu.getData();}) ||
             !m_bus.setReadCallback(JOY1, [&](void) {return m_controller1.read();}) ||
+            //!m_bus.setReadCallback(APUSTATUS,[&](void) {return m_apu.read8(elapsed);} ) ||
             !m_bus.setReadCallback(JOY2, [&](void) {return m_controller2.read();}) ||
             !m_bus.setReadCallback(OAMDATA, [&](void) {return m_ppu.getOAMData();}))
         {
@@ -37,10 +40,12 @@ namespace sn
         }
 
         m_ppu.setInterruptCallback([&](){ m_cpu.interrupt(CPU::NMI); });
+        
     }
 
     void Emulator::run(std::string rom_path)
     {
+
         if (!m_cartridge.loadFromFile(rom_path))
             return;
 
@@ -56,9 +61,11 @@ namespace sn
         if (!m_bus.setMapper(m_mapper.get()) ||
             !m_pictureBus.setMapper(m_mapper.get()))
             return;
-
+       
         m_cpu.reset();
         m_ppu.reset();
+        m_apu.reset();
+        
 
         m_window.create(sf::VideoMode(NESVideoWidth * m_screenScale, NESVideoHeight * m_screenScale),
                         "SimpleNES", sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize);
@@ -103,6 +110,8 @@ namespace sn
                         m_ppu.step();
                         //CPU
                         m_cpu.step();
+                        //APU
+                        m_apu.step(elapsed);
                     }
                 }
                 else if (focus && event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::F4)
@@ -126,16 +135,23 @@ namespace sn
 
                 while (m_elapsedTime > m_cpuCycleDuration)
                 {
+                    
                     //PPU
                     m_ppu.step();
                     m_ppu.step();
                     m_ppu.step();
                     //CPU
                     m_cpu.step();
+                    //APU
+                    m_apu.step(elapsed);
+                    
+     
+                    
+                   
 
                     m_elapsedTime -= m_cpuCycleDuration;
                 }
-
+                
                 m_window.draw(m_emulatorScreen);
                 m_window.display();
             }
