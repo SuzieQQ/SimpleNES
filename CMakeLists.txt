@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.2)
 project(SimpleNES)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -11,17 +11,15 @@ set(BUILD_STATIC FALSE CACHE STRING "Set this to link external libraries statica
 
 if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -g")
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 ")
 endif()
 
 # Add directory containing FindSFML.cmake to module path
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/;${CMAKE_MODULE_PATH};${CMAKE_SOURCE_DIR}")
 
 # Add sources
-file(GLOB SOURCES
-    "${PROJECT_SOURCE_DIR}/main.cpp"
-    "${PROJECT_SOURCE_DIR}/src/*.cpp"
-)
+file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/main.cpp" "${PROJECT_SOURCE_DIR}/src/*.cpp")
+
 
 # Copy keybindings.conf
 file(COPY keybindings.conf DESTINATION .)
@@ -71,8 +69,15 @@ else()
         message("Make sure the SFML libraries with the same configuration (Release/Debug, Static/Dynamic) exist.\n")
 endif()
 
+
+# Look up SDL2 and add include/lib dirs to it
+set(SDL2_BUILDING_LIBRARY ON) # Don't find SDL2main lib
+find_package(SDL2 REQUIRED)
+
+
 add_executable(SimpleNES ${SOURCES})
-target_link_libraries(SimpleNES ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
+target_link_libraries(SimpleNES ${SFML_LIBRARIES} ${SDL2_LIBRARY} ${SFML_DEPENDENCIES})
+
 
 set_property(TARGET SimpleNES PROPERTY CXX_STANDARD 11)
 set_property(TARGET SimpleNES PROPERTY CXX_STANDARD_REQUIRED ON)

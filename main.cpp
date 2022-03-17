@@ -1,5 +1,6 @@
 #include "Emulator.h"
 #include "Log.h"
+#include "apu.h"
 #include <string>
 #include <sstream>
 
@@ -22,7 +23,7 @@ int main(int argc, char** argv)
 
     sn::Log::get().setLevel(sn::Info);
 
-    std::string path;
+    std::string path; //= "A4.nes";
 
     //Default keybindings
     std::vector<sf::Keyboard::Key> p1 {sf::Keyboard::J, sf::Keyboard::K, sf::Keyboard::RShift, sf::Keyboard::Return,
@@ -30,6 +31,7 @@ int main(int argc, char** argv)
                                    p2 {sf::Keyboard::Numpad5, sf::Keyboard::Numpad6, sf::Keyboard::Numpad8, sf::Keyboard::Numpad9,
                                        sf::Keyboard::Up, sf::Keyboard::Down, sf::Keyboard::Left, sf::Keyboard::Right};
     sn::Emulator emulator;
+    sn::APU apu;
 
     for (int i = 1; i < argc; ++i)
     {
@@ -103,6 +105,7 @@ int main(int argc, char** argv)
 
     sn::parseControllerConf("keybindings.conf", p1, p2);
     emulator.setKeys(p1, p2);
+    apu.init();
     emulator.run(path);
     return 0;
 }
